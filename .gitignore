@@ -2,3 +2,11 @@
 *.jpg
 *.svg
 *.gif
+*.log
+*/.idea/workspace.xml
+*/.idea/tasks.xml
+*/build.xml
+*/out
+*/build
+*/dist
+*/nbproject
