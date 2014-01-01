@@ -51,7 +51,7 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="af438" class="javax.swing.JButton" binding="liveObjectsButton" default-binding="true">
+              <component id="af438" class="javax.swing.JButton" binding="m_liveObjectsButton">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -104,6 +104,7 @@
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
+                  <enabled value="false"/>
                   <text value="Start Thread"/>
                 </properties>
               </component>
@@ -147,7 +148,7 @@
                   <text value="Cration Period:"/>
                 </properties>
               </component>
-              <component id="8d2d4" class="javax.swing.JTextField" binding="m_devCreationPeriod">
+              <component id="8d2d4" class="javax.swing.JTextField" binding="m_devCreationPeriodField">
                 <constraints>
                   <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -226,7 +227,9 @@
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="StartThread"/>
+                  <doubleBuffered value="false"/>
+                  <enabled value="false"/>
+                  <text value="Start Thread"/>
                 </properties>
               </component>
               <component id="dc60f" class="javax.swing.JLabel">
@@ -324,7 +327,7 @@
                     <item value="90  %"/>
                     <item value="100 %"/>
                   </model>
-                  <selectedIndex value="0"/>
+                  <selectedIndex value="-1"/>
                   <selectionMode value="0"/>
                 </properties>
               </component>
