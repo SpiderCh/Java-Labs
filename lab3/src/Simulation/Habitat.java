@@ -82,8 +82,6 @@ public class Habitat
         try {
             m_dev_image = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/Icons/linux_logo.png"));
             m_man_image = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/Icons/win_logo.png"));
-//            m_dev_image = Toolkit.getDefaultToolkit().getImage(dev_image_path);
-//            m_man_image = Toolkit.getDefaultToolkit().getImage(man_image_path);
         } catch (Exception e) {
             e.printStackTrace();
         }

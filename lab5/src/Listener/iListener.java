@@ -1,9 +1,10 @@
 package Listener;
 
+import Signal.SignalType;
+
 public interface iListener
 {
-	public boolean subscribe(iObservable observable, Actions action);
-	public boolean unsubscribe(iObservable observable, Actions action);
-	public void addAction(iObservable caller, Actions action);
-	public void addAction(iObservable caller, Actions action, Object data);
+	public boolean subscribe(iObservable observable, SignalType action);
+	public boolean unsubscribe(iObservable observable, SignalType action);
+	public void signal(iObservable caller, Message mess);
 }

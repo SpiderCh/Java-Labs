@@ -3,32 +3,34 @@ package Listener;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import Signal.SignalType;
 
-public class Listener implements iListener
+class MessageWrapper
+{
+	public Message mess;
+	public iObservable caller;
+
+	public MessageWrapper(iObservable caller, Message mess)
+	{
+		this.caller = caller;
+		this.mess = mess;
+	}
+}
+
+public class Listener extends Thread implements iListener
 {
 	private static Listener instance;
 
-	private final HashMap<Actions, LinkedList<iObservable>> _m_observables;
+	private final LinkedList<MessageWrapper> m_messageQueue;
+	private final HashMap<SignalType, LinkedList<iObservable>> m_observables;
+	private boolean m_continueExecution;
 
 	private void registerActions()
 	{
-		_m_observables.put(Actions.Stop,                            new LinkedList<iObservable>());
-		_m_observables.put(Actions.Start,                           new LinkedList<iObservable>());
-		_m_observables.put(Actions.Pause,                           new LinkedList<iObservable>());
-		_m_observables.put(Actions.ShowTime,                        new LinkedList<iObservable>());
-		_m_observables.put(Actions.HideTime,                        new LinkedList<iObservable>());
-		_m_observables.put(Actions.ForceStop,                       new LinkedList<iObservable>());
-		_m_observables.put(Actions.LiveObjects,                     new LinkedList<iObservable>());
-		_m_observables.put(Actions.ShowLiveObjects,                 new LinkedList<iObservable>());
-		_m_observables.put(Actions.SimulationResults,               new LinkedList<iObservable>());
-		_m_observables.put(Actions.ShowSimulationInfo,              new LinkedList<iObservable>());
-		_m_observables.put(Actions.HideSimulationInfo,              new LinkedList<iObservable>());
-		_m_observables.put(Actions.DevLiveTimeChanged,              new LinkedList<iObservable>());
-		_m_observables.put(Actions.DevPossibilityChanged,           new LinkedList<iObservable>());
-		_m_observables.put(Actions.ManagerLiveTimeChanged,          new LinkedList<iObservable>());
-		_m_observables.put(Actions.ManagerMaxNumberChanged,         new LinkedList<iObservable>());
-		_m_observables.put(Actions.DevCreationPeriodChanged,        new LinkedList<iObservable>());
-		_m_observables.put(Actions.ManagerCreationPeriodChanged,    new LinkedList<iObservable>());
+		m_observables.put(SignalType.DATA, new LinkedList<iObservable>());
+		m_observables.put(SignalType.INFO, new LinkedList<iObservable>());
+		m_observables.put(SignalType.SYSTEM, new LinkedList<iObservable>());
+		m_observables.put(SignalType.SIGNAL, new LinkedList<iObservable>());
 	}
 
 	public static Listener getInstance()
@@ -47,44 +49,62 @@ public class Listener implements iListener
 
 	private Listener()
 	{
-		_m_observables = new HashMap<>();
+		m_messageQueue = new LinkedList<>();
+		m_observables = new HashMap<>();
+		m_continueExecution = true;
 		registerActions();
 	}
 
 	@Override
-	public boolean subscribe(iObservable observable, Actions action)
+	public boolean subscribe(iObservable observable, SignalType action)
 	{
-		return _m_observables.get(action).add(observable);
+		return m_observables.get(action).add(observable);
 	}
 
 	@Override
-	public boolean unsubscribe(iObservable observable, Actions action)
+	public boolean unsubscribe(iObservable observable, SignalType action)
 	{
-		return _m_observables.get(action).remove(observable);
+		return m_observables.get(action).remove(observable);
 	}
 
 	@Override
-	public void addAction(iObservable caller, Actions action)
+	public void signal(iObservable caller, Message mess)
 	{
-		Iterator<iObservable> observable = _m_observables.get(action).iterator();
-		while (observable.hasNext()) {
-			iObservable o = observable.next();
-			if (o != caller) {
-				o.newAction(action);
+		m_messageQueue.addLast(new MessageWrapper(caller, mess));
+		synchronized (m_messageQueue) {m_messageQueue.notifyAll();}
+	}
+
+	@Override
+	public void run()
+	{
+		while(m_continueExecution) {
+			if(m_messageQueue.isEmpty()) {
+				try {
+					synchronized (m_messageQueue) {
+						m_messageQueue.wait();
+						if(m_messageQueue.isEmpty()) {continue;}
+					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			MessageWrapper mess;
+			synchronized (m_messageQueue) {
+				mess = m_messageQueue.pop();
+			}
+			Iterator<iObservable> it = m_observables.get(mess.mess.m_signalType).iterator();
+			while(it.hasNext()) {
+				iObservable o = it.next();
+				if(o != mess.caller) {
+					o.signal(mess.mess);
+				}
 			}
 		}
 	}
 
-	@Override
-	public void addAction(iObservable caller, Actions action, Object data)
+	public void stopQueue()
 	{
-		//Iterator<iObservable> observable = m_observables.iterator();
-		Iterator<iObservable> observable = _m_observables.get(action).iterator();
-		while (observable.hasNext()) {
-			iObservable o = observable.next();
-			if (o != caller) {
-				o.newAction(action, data);
-			}
-		}
+		m_continueExecution = false;
+		synchronized (m_messageQueue) {m_messageQueue.notifyAll();}
 	}
 }

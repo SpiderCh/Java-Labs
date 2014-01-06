@@ -1,7 +1,9 @@
 package GUI;
 
-import Listener.Actions;
+import Signal.SignalType;
+import Signal.Signal;
 import Listener.Listener;
+import Listener.Message;
 import Listener.iListener;
 import Listener.iObservable;
 import Utils.Int;
@@ -51,13 +53,8 @@ public class ControlPanel implements iObservable
 
 	private void subscribe()
 	{
-		m_listener.subscribe(this, Actions.Stop);
-		m_listener.subscribe(this, Actions.Start);
-		m_listener.subscribe(this, Actions.Pause);
-		m_listener.subscribe(this, Actions.ShowTime);
-		m_listener.subscribe(this, Actions.HideTime);
-		m_listener.subscribe(this, Actions.ShowSimulationInfo);
-		m_listener.subscribe(this, Actions.HideSimulationInfo);
+		m_listener.subscribe(this, SignalType.SIGNAL);
+		m_listener.subscribe(this, SignalType.INFO);
 	}
 
 	private void initVars()
@@ -80,7 +77,7 @@ public class ControlPanel implements iObservable
 				m_stopButton.setEnabled(true);
 				m_devThreadButton.setEnabled(true);
 				m_managersThreadButton.setEnabled(true);
-				m_listener.addAction(ControlPanel.this, Actions.Start);
+				m_listener.signal(ControlPanel.this, new Message(SignalType.SIGNAL, Signal.Start));
 
 			}
 		});
@@ -91,7 +88,8 @@ public class ControlPanel implements iObservable
 				m_stopButton.setEnabled(false);
 				m_devThreadButton.setEnabled(false);
 				m_managersThreadButton.setEnabled(false);
-				m_listener.addAction(ControlPanel.this, Actions.Stop);
+				m_listener.signal(ControlPanel.this,
+						new Message(SignalType.SIGNAL, Signal.Stop));
 			}
 		});
 		m_devThreadButton.addActionListener(new ActionListener()
@@ -133,7 +131,7 @@ public class ControlPanel implements iObservable
 					JOptionPane.showMessageDialog(null, "You forgot enter the value.\nLet me do this for you.");
 					m_devCreationPeriodField.setText(m_devCreationPeriod.toString());
 				} else {
-					fieldValueChanged(m_devCreationPeriodField.getText(), Actions.DevCreationPeriodChanged);
+					fieldValueChanged(m_devCreationPeriodField.getText(), Signal.DevCreationPeriodChanged);
 				}
 			}
 		});
@@ -145,7 +143,7 @@ public class ControlPanel implements iObservable
 					JOptionPane.showMessageDialog(null, "You forgot enter the value.\nLet me do this for you.");
 					m_devLifeTimeField.setText(m_devLifeTime.toString());
 				} else {
-					fieldValueChanged(m_devLifeTimeField.getText(), Actions.DevLiveTimeChanged);
+					fieldValueChanged(m_devLifeTimeField.getText(), Signal.DevLiveTimeChanged);
 				}
 			}
 		});
@@ -157,7 +155,7 @@ public class ControlPanel implements iObservable
 					JOptionPane.showMessageDialog(null, "You forgot enter the value.\nLet me do this for you.");
 					m_managerCreationPeriodField.setText(m_managerCreationPeriod.toString());
 				} else {
-					fieldValueChanged(m_managerCreationPeriodField.getText(), Actions.ManagerCreationPeriodChanged);
+					fieldValueChanged(m_managerCreationPeriodField.getText(), Signal.ManagerCreationPeriodChanged);
 				}
 			}
 		});
@@ -169,18 +167,18 @@ public class ControlPanel implements iObservable
 					JOptionPane.showMessageDialog(null, "You forgot enter the value.\nLet me do this for you.");
 					m_managersLifeTimeField.setText(m_managerLifeTime.toString());
 				} else {
-					fieldValueChanged(m_managersLifeTimeField.getText(), Actions.ManagerLiveTimeChanged);
+					fieldValueChanged(m_managersLifeTimeField.getText(), Signal.ManagerLiveTimeChanged);
 				}
 			}
 		});
 		m_showTimeRadioButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				m_listener.addAction(ControlPanel.this, Actions.ShowTime);
+				m_listener.signal(ControlPanel.this, new Message(SignalType.INFO, Signal.ShowTime));
 			}
 		});
 		m_hideTimeRadioButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				m_listener.addAction(ControlPanel.this, Actions.HideTime);
+				m_listener.signal(ControlPanel.this, new Message(SignalType.INFO, Signal.HideTime));
 			}
 		});
 		m_showSimulationInfoBox.addActionListener(new ActionListener()
@@ -191,10 +189,10 @@ public class ControlPanel implements iObservable
 				boolean selected = m_showSimulationInfoBox.isSelected();
 				if(selected) {
 					m_pauseEnabled = true;
-					m_listener.addAction(ControlPanel.this, Actions.ShowSimulationInfo);
+					m_listener.signal(ControlPanel.this, new Message(SignalType.INFO, Signal.ShowSimulationInfo));
 				} else {
 					m_pauseEnabled = false;
-					m_listener.addAction(ControlPanel.this, Actions.HideSimulationInfo);
+					m_listener.signal(ControlPanel.this, new Message(SignalType.INFO, Signal.HideSimulationInfo));
 				}
 			}
 		});
@@ -203,7 +201,7 @@ public class ControlPanel implements iObservable
 			@Override
 			public void actionPerformed(ActionEvent actionEvent)
 			{
-				m_listener.addAction(ControlPanel.this, Actions.ShowLiveObjects);
+				m_listener.signal(ControlPanel.this, new Message(SignalType.INFO, Signal.ShowLiveObjects));
 			}
 		});
 		m_devCreationPossibilityBox.addActionListener(new ActionListener()
@@ -213,7 +211,9 @@ public class ControlPanel implements iObservable
 			{
 				float possibility = m_devCreationPossibilityBox.getSelectedIndex() + 1;
 				possibility *= .1;
-				Listener.getInstance().addAction(ControlPanel.this, Actions.DevPossibilityChanged, new Float(possibility));
+				Listener.getInstance().signal(ControlPanel.this,
+						new Message(SignalType.DATA, Signal.DevPossibilityChanged, new Float(possibility)));
+
 				if(System.getProperty("DEBUG").equals("1")) {
 					System.out.println("\tDev Possibility: " + possibility);
 				}
@@ -226,7 +226,8 @@ public class ControlPanel implements iObservable
 			{
 				float possibility = m_managersPercentList.getSelectedIndex() + 1;
 				possibility *= .1;
-				Listener.getInstance().addAction(ControlPanel.this, Actions.ManagerMaxNumberChanged, new Float(possibility));
+				Listener.getInstance().signal(ControlPanel.this,
+						new Message(SignalType.DATA, Signal.ManagerMaxNumberChanged, new Float(possibility)));
 
 				if(System.getProperty("DEBUG").equals("1")) {
 					System.out.println("\tManager Possibility: " + possibility);
@@ -238,7 +239,9 @@ public class ControlPanel implements iObservable
 			@Override
 			public void actionPerformed(ActionEvent actionEvent)
 			{
-
+				int priority = m_devThreadPriorityBox.getSelectedIndex();
+				m_listener.signal(ControlPanel.this,
+						new Message(SignalType.DATA, Signal.DevThreadPriority, new Integer(priority)));
 			}
 		});
 		m_managersThreadPriorityBox.addActionListener(new ActionListener()
@@ -246,12 +249,14 @@ public class ControlPanel implements iObservable
 			@Override
 			public void actionPerformed(ActionEvent actionEvent)
 			{
-
+				int priority = m_managersThreadPriorityBox.getSelectedIndex();
+				m_listener.signal(ControlPanel.this,
+						new Message(SignalType.DATA, Signal.ManagerThreaadPriority, new Integer(priority)));
 			}
 		});
 	}
 
-	private void fieldValueChanged(String time, Actions type)
+	private void fieldValueChanged(String time, Signal type)
 	{
 		Int val;
 		JTextField currField;
@@ -279,7 +284,7 @@ public class ControlPanel implements iObservable
 
 		try{
 			val.fromString(time);
-			m_listener.addAction(this, type, val);
+			m_listener.signal(this, new Message(SignalType.DATA, type, val));
 		} catch (java.lang.NumberFormatException e) {
 			JOptionPane.showMessageDialog(null, "Well, on this machine max value of current field is: "
 					+ Integer.MAX_VALUE + "\nReturning to previous value: " + val.toString());
@@ -315,10 +320,15 @@ public class ControlPanel implements iObservable
 		initHandlers();
 	}
 
-	@Override
-	public void newAction(Actions action)
+	public JPanel getContentPane()
 	{
-		switch (action)
+		return m_controlPanel;
+	}
+
+	@Override
+	public void signal(Message mess)
+	{
+		switch (mess.m_action)
 		{
 			case Start:
 				m_startButton.setEnabled(false);
@@ -347,11 +357,5 @@ public class ControlPanel implements iObservable
 				m_showSimulationInfoBox.setSelected(false);
 				break;
 		}
-	}
-
-	@Override
-	public void newAction(Actions action, Object data)
-	{
-
 	}
 }

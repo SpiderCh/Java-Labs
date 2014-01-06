@@ -1,58 +1,72 @@
 package GUI;
 
-import Listener.Actions;
+import Signal.SignalType;
+import Signal.Signal;
 import Listener.Listener;
+import Listener.Message;
 import Listener.iObservable;
 import Listener.iListener;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class ToolBar implements iObservable
+public class ToolBar implements iObservable, ChangeListener
 {
-	private JButton m_startButton;
-	private JButton m_stopButton;
-	private JButton m_timeButton;
-	private JPanel m_simulationPanel;
+	private JButton   m_startButton;
+	private JButton   m_stopButton;
+	private JButton   m_timeButton;
+	private JPanel    m_controlBar;
+	private JSlider   m_updatePeriodSlider;
+	private JLabel    m_periodValue;
 	private iListener m_listener;
-	private boolean m_showTime;
+	private boolean   m_showTime;
 
 	private void subscribe()
 	{
-		m_listener.subscribe(this, Actions.Stop);
-		m_listener.subscribe(this, Actions.Start);
-		m_listener.subscribe(this, Actions.ShowTime);
-		m_listener.subscribe(this, Actions.HideTime);
+		m_listener.subscribe(this, SignalType.SIGNAL);
+		m_listener.subscribe(this, SignalType.INFO);
 	}
 
 	private void initHandlers()
 	{
-		m_startButton.addActionListener(new ActionListener() {
+		m_startButton.addActionListener(new ActionListener()
+		{
 			@Override
-			public void actionPerformed(ActionEvent actionEvent) {
+			public void actionPerformed(ActionEvent actionEvent)
+			{
 				m_startButton.setEnabled(false);
 				m_stopButton.setEnabled(true);
-				Listener.getInstance().addAction(ToolBar.this, Actions.Start);
+				m_listener.signal(ToolBar.this,
+						new Message(SignalType.SIGNAL, Signal.Start));
 			}
 		});
 
-		m_stopButton.addActionListener(new ActionListener() {
+		m_stopButton.addActionListener(new ActionListener()
+		{
 			@Override
-			public void actionPerformed(ActionEvent actionEvent) {
+			public void actionPerformed(ActionEvent actionEvent)
+			{
 				m_startButton.setEnabled(true);
 				m_stopButton.setEnabled(false);
-				Listener.getInstance().addAction(ToolBar.this, Actions.Stop);
+				m_listener.signal(ToolBar.this,
+						new Message(SignalType.SIGNAL, Signal.Stop));
 			}
 		});
 
-		m_timeButton.addActionListener(new ActionListener() {
+		m_timeButton.addActionListener(new ActionListener()
+		{
 			@Override
-			public void actionPerformed(ActionEvent actionEvent) {
-				if(m_showTime) {
-					m_listener.addAction(ToolBar.this, Actions.HideTime);
+			public void actionPerformed(ActionEvent actionEvent)
+			{
+				if (m_showTime) {
+					m_listener.signal(ToolBar.this,
+							new Message(SignalType.INFO, Signal.HideTime));
 				} else {
-					m_listener.addAction(ToolBar.this, Actions.ShowTime);
+					m_listener.signal(ToolBar.this,
+							new Message(SignalType.INFO, Signal.ShowTime));
 				}
 				m_showTime = !m_showTime;
 			}
@@ -64,14 +78,20 @@ public class ToolBar implements iObservable
 		m_listener = Listener.getInstance();
 		m_stopButton.setEnabled(false);
 		m_showTime = true;
+		m_updatePeriodSlider.addChangeListener(this);
 		initHandlers();
 		subscribe();
 	}
 
-	@Override
-	public void newAction(Actions action)
+	public JPanel getContentPane()
 	{
-		switch(action)
+		return m_controlBar;
+	}
+
+	@Override
+	public void signal(Message mess)
+	{
+		switch(mess.m_action)
 		{
 			case Start:
 				m_stopButton.setEnabled(true);
@@ -91,5 +111,14 @@ public class ToolBar implements iObservable
 	}
 
 	@Override
-	public void newAction(Actions action, Object data) {}
+	public void stateChanged(ChangeEvent changeEvent)
+	{
+		String st;
+		int val = m_updatePeriodSlider.getValue();
+		float tick = m_updatePeriodSlider.getValue() * .1f;
+		st = String.valueOf(tick);
+		m_periodValue.setText(st + " s");
+		m_listener.signal(this,
+				new Message(SignalType.SYSTEM, Signal.TimeDimensionChanged, new Integer(val)));
+	}
 }

@@ -7,7 +7,8 @@ import Listener.Listener;
 
 public class Main
 {
-	public static void main(String[] args) {
+	public static void main(String[] args)
+	{
 		if (System.getProperty("DEBUG").equals("1")) {
 			System.out.println("Running in debug mode.");
 		}
@@ -21,12 +22,12 @@ public class Main
 				System.out.println("Cannot setup system look and feel");
 			}
 		}
-		java.awt.EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				Listener.getInstance();
+		Listener.getInstance().start();
+//		java.awt.EventQueue.invokeLater(new Runnable() {
+//			@Override
+//			public void run() {
 				new MainWindow().setVisible(true);
-			}
-		});
+//			}
+//		});
 	}
 }

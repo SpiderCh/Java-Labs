@@ -1,7 +1,9 @@
 package GUI;
 
-import Listener.Actions;
+import Signal.SignalType;
+import Signal.Signal;
 import Listener.Listener;
+import Listener.Message;
 import Listener.iListener;
 import Listener.iObservable;
 
@@ -21,12 +23,8 @@ public class MenuBar extends JMenuBar implements iObservable
 
 	private void subscribe()
 	{
-		m_listener.subscribe(this, Actions.Stop);
-		m_listener.subscribe(this, Actions.Start);
-		m_listener.subscribe(this, Actions.ShowTime);
-		m_listener.subscribe(this, Actions.HideTime);
-		m_listener.subscribe(this, Actions.ShowSimulationInfo);
-		m_listener.subscribe(this, Actions.HideSimulationInfo);
+		m_listener.subscribe(this, SignalType.SIGNAL);
+		m_listener.subscribe(this, SignalType.INFO);
 	}
 
 	private void initMenuBar()
@@ -38,6 +36,14 @@ public class MenuBar extends JMenuBar implements iObservable
 				{
 					@Override
 					public void actionPerformed(ActionEvent e) {
+						Listener.getInstance().stopQueue();
+						try {
+							Listener.getInstance().join();
+						} catch (InterruptedException e1) {
+					/*
+					 * Add some kind of usefull output
+					 */
+						}
 						System.exit(0);
 					}
 				}
@@ -53,16 +59,16 @@ public class MenuBar extends JMenuBar implements iObservable
 			{
 				if(m_startEnabled) {
 					if(m_pauseEnabled) {
-						m_listener.addAction(MenuBar.this, Actions.Pause);
+						m_listener.signal(MenuBar.this, new Message(SignalType.SIGNAL, Signal.Pause));
 					} else {
 						m_startEnabled = false;
 						m_startStopItem.setText("Start");
-						m_listener.addAction(MenuBar.this, Actions.Stop);
+						m_listener.signal(MenuBar.this, new Message(SignalType.SIGNAL, Signal.Stop));
 					}
 				} else {
 					m_startEnabled = true;
 					m_startStopItem.setText("Stop");
-					m_listener.addAction(MenuBar.this, Actions.Start);
+					m_listener.signal(MenuBar.this, new Message(SignalType.SIGNAL, Signal.Start));
 				}
 			}
 		});
@@ -76,9 +82,9 @@ public class MenuBar extends JMenuBar implements iObservable
 			{
 				boolean show = m_changeShowTimeItem.isSelected();
 				if(show) {
-					m_listener.addAction(MenuBar.this, Actions.ShowTime);
+					m_listener.signal(MenuBar.this, new Message(SignalType.INFO, Signal.ShowTime));
 				} else {
-					m_listener.addAction(MenuBar.this, Actions.HideTime);
+					m_listener.signal(MenuBar.this, new Message(SignalType.INFO, Signal.HideTime));
 				}
 			}
 		});
@@ -93,10 +99,10 @@ public class MenuBar extends JMenuBar implements iObservable
 				boolean show = m_changeShowInfoItem.isSelected();
 				if(show) {
 					m_pauseEnabled = true;
-					m_listener.addAction(MenuBar.this, Actions.ShowSimulationInfo);
+					m_listener.signal(MenuBar.this, new Message(SignalType.INFO, Signal.ShowSimulationInfo));
 				} else {
 					m_pauseEnabled = false;
-					m_listener.addAction(MenuBar.this, Actions.HideSimulationInfo);
+					m_listener.signal(MenuBar.this, new Message(SignalType.INFO, Signal.HideSimulationInfo));
 				}
 			}
 		});
@@ -116,9 +122,9 @@ public class MenuBar extends JMenuBar implements iObservable
 	}
 
 	@Override
-	public void newAction(Actions action)
+	public void signal(Message mess)
 	{
-		switch (action) {
+		switch (mess.m_action) {
 			case Start:
 				m_startStopItem.setText("Stop");
 				m_startEnabled = true;
@@ -143,7 +149,4 @@ public class MenuBar extends JMenuBar implements iObservable
 				break;
 		}
 	}
-
-	@Override
-	public void newAction(Actions action, Object data) {}
 }
