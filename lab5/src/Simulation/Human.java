@@ -68,15 +68,15 @@ public abstract class Human implements iBehaviour {
 	}
 
 	@Override
-	public void paint(Graphics graphics, Pair<Integer, Integer> border)
+	public void paint(Graphics graphics, Pair<Int, Int> border)
 	{
 		int width = m_image.getWidth(null);
 		int height = m_image.getHeight(null);
 		if(width == -1 || height == -1){
 			return;
 		}
-		int offscreen_width = border.first - (m_position.first.get() + width);
-		int offscreen_height = border.second - (m_position.second.get() + height);
+		int offscreen_width = border.first.get() - (m_position.first.get() + width);
+		int offscreen_height = border.second.get() - (m_position.second.get() + height);
 
 		graphics.drawImage(m_image, m_position.first.get(), m_position.second.get(), null);
 		if(offscreen_width < 0 || offscreen_height < 0) {

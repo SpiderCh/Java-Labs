@@ -5,12 +5,10 @@ import Utils.Pair;
 
 import java.awt.*;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.TreeSet;
 
-/**
- * Created by chas on 06.01.14.
- */
 public class Habitat
 {
 	private final Pair<Int, Int> m_workingAreaSize;
@@ -83,11 +81,11 @@ public class Habitat
 	public void paint(Graphics graphics)
 	{
 		if (m_isRunning) {
-//			Iterator<Human> it = m_personal_list.iterator();
-//			while (it.hasNext()) {
-//				Human h = it.next();
-//				h.paint(graphics, m_working_area_size);
-//			}
+		Iterator<Human> it = m_personalList.iterator();
+		while (it.hasNext()) {
+			Human h = it.next();
+			h.paint(graphics, m_workingAreaSize);
+		}
 
 			if (m_showTime) {
 				graphics.setColor(Color.RED);
@@ -115,6 +113,9 @@ public class Habitat
 	public void stop()
 	{
 		m_isRunning = false;
+		m_personalList.clear();
+		m_ids.clear();
+		m_curentPersonal.clear();
 	}
 
 	public void setDevCreationPeriod(int time)
