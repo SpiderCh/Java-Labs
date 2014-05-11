@@ -12,7 +12,6 @@ public class Updater extends TimerTask {
 
 	public Updater(iWindow window)
 	{
-		System.out.println("Created timer");
 		m_window = window;
 		m_first_run = true;
 		m_start_time = 0;
@@ -26,7 +25,7 @@ public class Updater extends TimerTask {
 			m_first_run = false;
 		}
 		long currentTime = System.currentTimeMillis();
-		int elapsed = (int)((currentTime - m_start_time) / 100.0);
+		int elapsed = (int)((currentTime - m_start_time) / 1000.0);
 		m_window.update(elapsed);
 	}
 }

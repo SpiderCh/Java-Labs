@@ -13,18 +13,18 @@ import java.awt.MenuBar;
 import Listener.iListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.HashMap;
 import java.util.Timer;
 
 public class MainWindow extends JFrame implements iObservable, iWindow
 {
-	private JPanel         m_mainPanel;
+	private JPanel          m_mainPanel;
 	private SimulationPanel m_simulationPanel;
-	private ToolBar        m_toolBarPanel;
-	private ControlPanel m_controlPanel;
-	private Timer     m_timer;
-	private iListener m_listener;
-	private int       m_timerRegister;
-	private int       m_currentTimerState;
+	private ToolBar         m_toolBarPanel;
+	private ControlPanel    m_controlPanel;
+	private Timer           m_timer;
+	private iListener       m_listener;
+    private ResultDialog    m_resultDialog;
 
 	private void setupCloseAction()
 	{
@@ -54,6 +54,7 @@ public class MainWindow extends JFrame implements iObservable, iWindow
 	{
 		m_listener = Listener.getInstance();
 		m_listener.subscribe(this, SignalType.SIGNAL);
+        m_listener.subscribe(this, SignalType.DATA);
 		m_listener.subscribe(this, SignalType.SYSTEM);
 	}
 
@@ -71,25 +72,26 @@ public class MainWindow extends JFrame implements iObservable, iWindow
 		GUI.MenuBar m_menuBar = new GUI.MenuBar();
 		setJMenuBar(m_menuBar);
 		setupCloseAction();
+        setFocusable(true);
 	}
+
+    private void initVars()
+    {
+        m_resultDialog = new ResultDialog("Simulation Results");
+    }
 
 	public MainWindow()
 	{
 		initListener();
 		initWindow();
-		m_timerRegister = 1;
-		m_currentTimerState = 1;
+        initVars();
 	}
 
 	@Override
 	public void update(int time)
 	{
-		if(m_currentTimerState >= m_timerRegister) {
-			m_simulationPanel.update(time);
-			m_currentTimerState = 0;
-			repaint();
-		}
-		++m_currentTimerState;
+        m_simulationPanel.update(time);
+        repaint();
 	}
 
 	@Override
@@ -98,16 +100,19 @@ public class MainWindow extends JFrame implements iObservable, iWindow
 		switch (mess.m_action) {
 			case Start:
 				m_timer = new Timer();
-				m_timer.schedule(new Updater(this), 0, 100);
+				m_timer.schedule(new Updater(this), 0, 1000);
+                repaint();
 				break;
 			case ForceStop:
 			case Stop:
 				m_timer.cancel();
 				m_timer = null;
+                repaint();
 				break;
-			case TimeDimensionChanged:
-				m_timerRegister = (Integer)mess.m_data;
-				break;
+            case LiveObjects:
+                HashMap<Integer, Integer> map = (HashMap<Integer, Integer>) mess.m_data;
+                new TableDialog("Live Objects", map);
+                break;
 		}
 	}
 }

@@ -13,16 +13,16 @@ import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class ToolBar implements iObservable, ChangeListener
+public class ToolBar implements iObservable//, ChangeListener
 {
 	private JButton   m_startButton;
 	private JButton   m_stopButton;
 	private JButton   m_timeButton;
 	private JPanel    m_controlBar;
-	private JSlider   m_updatePeriodSlider;
 	private JLabel    m_periodValue;
 	private iListener m_listener;
 	private boolean   m_showTime;
+    private boolean   m_pauseEnabled;
 
 	private void subscribe()
 	{
@@ -44,33 +44,33 @@ public class ToolBar implements iObservable, ChangeListener
 			}
 		});
 
-		m_stopButton.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent actionEvent)
-			{
-				m_startButton.setEnabled(true);
-				m_stopButton.setEnabled(false);
-				m_listener.signal(ToolBar.this,
-						new Message(SignalType.SIGNAL, Signal.Stop));
-			}
-		});
+		m_stopButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if(m_pauseEnabled) {
+                    m_listener.signal(ToolBar.this, new Message(SignalType.SIGNAL, Signal.Pause, null));
+                } else {
+                    m_startButton.setEnabled(true);
+                    m_stopButton.setEnabled(false);
+                    m_listener.signal(ToolBar.this,
+                            new Message(SignalType.SIGNAL, Signal.Stop));
+                }
+            }
+        });
 
-		m_timeButton.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent actionEvent)
-			{
-				if (m_showTime) {
-					m_listener.signal(ToolBar.this,
-							new Message(SignalType.INFO, Signal.HideTime));
-				} else {
-					m_listener.signal(ToolBar.this,
-							new Message(SignalType.INFO, Signal.ShowTime));
-				}
-				m_showTime = !m_showTime;
-			}
-		});
+		m_timeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (m_showTime) {
+                    m_listener.signal(ToolBar.this,
+                            new Message(SignalType.INFO, Signal.HideTime));
+                } else {
+                    m_listener.signal(ToolBar.this,
+                            new Message(SignalType.INFO, Signal.ShowTime));
+                }
+                m_showTime = !m_showTime;
+            }
+        });
 	}
 
 	public ToolBar()
@@ -78,7 +78,7 @@ public class ToolBar implements iObservable, ChangeListener
 		m_listener = Listener.getInstance();
 		m_stopButton.setEnabled(false);
 		m_showTime = true;
-		m_updatePeriodSlider.addChangeListener(this);
+        m_pauseEnabled = false;
 		initHandlers();
 		subscribe();
 	}
@@ -98,6 +98,7 @@ public class ToolBar implements iObservable, ChangeListener
 				m_startButton.setEnabled(false);
 				break;
 			case Stop:
+            case ForceStop:
 				m_stopButton.setEnabled(false);
 				m_startButton.setEnabled(true);
 				break;
@@ -107,18 +108,12 @@ public class ToolBar implements iObservable, ChangeListener
 			case HideTime:
 				m_showTime = false;
 				break;
+            case ShowSimulationInfo:
+                m_pauseEnabled = true;
+                break;
+            case HideSimulationInfo:
+                m_pauseEnabled = false;
+                break;
 		}
-	}
-
-	@Override
-	public void stateChanged(ChangeEvent changeEvent)
-	{
-		String st;
-		int val = m_updatePeriodSlider.getValue();
-		float tick = m_updatePeriodSlider.getValue() * .1f;
-		st = String.valueOf(tick);
-		m_periodValue.setText(st + " s");
-		m_listener.signal(this,
-				new Message(SignalType.SYSTEM, Signal.TimeDimensionChanged, new Integer(val)));
 	}
 }

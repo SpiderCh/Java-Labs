@@ -1,6 +1,8 @@
 package Simulation;
 
 public class Developer extends Human {
+    protected float m_dx = 1;
+    protected float m_dy = 0;
 
 	public Developer(String path)
 	{

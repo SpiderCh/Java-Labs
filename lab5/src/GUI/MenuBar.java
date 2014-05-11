@@ -130,6 +130,7 @@ public class MenuBar extends JMenuBar implements iObservable
 				m_startEnabled = true;
 				break;
 			case Stop:
+            case ForceStop:
 				m_startStopItem.setText("Start");
 				m_startEnabled = false;
 				break;

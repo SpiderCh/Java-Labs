@@ -10,6 +10,7 @@ import Simulation.Habitat;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashMap;
 
 public class SimulationPanel extends JPanel implements iObservable
 {
@@ -35,7 +36,7 @@ public class SimulationPanel extends JPanel implements iObservable
 
 	public void update(int time)
 	{
-		m_habitat.update(time / 10f);
+		m_habitat.update(time);
 	}
 
 	@Override
@@ -56,6 +57,9 @@ public class SimulationPanel extends JPanel implements iObservable
 			case ForceStop:
 				m_habitat.stop();
 				break;
+            case Pause:
+                m_listener.signal(this, new Message(SignalType.DATA, Signal.SimulationResults, m_habitat.getResultStr()));
+                break;
 			case ShowTime:
 				m_habitat.showTime(true);
 				break;
@@ -63,6 +67,8 @@ public class SimulationPanel extends JPanel implements iObservable
 				m_habitat.showTime(false);
 				break;
 			case ShowLiveObjects:
+                HashMap<Integer, Integer> map = m_habitat.getCurrentPersonalTable();
+                m_listener.signal(this, new Message(SignalType.DATA, Signal.LiveObjects, map));
 				break;
 			case DevCreationPeriodChanged:
 				m_habitat.setDevCreationPeriod((Integer)mess.m_data);

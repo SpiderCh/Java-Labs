@@ -15,7 +15,6 @@ public enum Signal
 	HideTime,
 	ShowLiveObjects,
 	SimulationResults,
-	LiveObjects,
 	//	END: INFO
 //	BEGIN: DATA
 	DevCreationPeriodChanged,
@@ -26,6 +25,7 @@ public enum Signal
 	ManagerMaxNumberChanged,
 	DevThreadPriority,
 	ManagerThreaadPriority,
+    LiveObjects,
 	//	END: DATA
 //	BEGIN: SYSTEM
 	Repaint,

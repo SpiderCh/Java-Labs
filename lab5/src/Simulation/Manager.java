@@ -1,6 +1,8 @@
 package Simulation;
 
 public class Manager extends Human {
+    protected float m_xCenter = 0;
+    protected float m_yCenter = 0;
 
 	public Manager(String path)
 	{

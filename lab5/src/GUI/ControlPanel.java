@@ -59,13 +59,18 @@ public class ControlPanel implements iObservable
 
 	private void initVars()
 	{
-		m_devLifeTime = new Int(1);
-		m_managerLifeTime = new Int(1);
-		m_devCreationPeriod = new Int(1);
-		m_managerCreationPeriod = new Int(1);
+		m_devLifeTime = new Int(10);
+		m_managerLifeTime = new Int(11);
+		m_devCreationPeriod = new Int(5);
+		m_managerCreationPeriod = new Int(9);
 		m_pauseEnabled = false;
 		m_devThreadRunning = false;
 		m_managerThreadRunning = false;
+
+        m_devCreationPossibilityBox.setSelectedIndex(4);
+        m_devCreationPossibilityBox.setFocusable(false);
+        m_managersPercentList.setSelectedIndex(6);
+        m_managersPercentList.setFocusable(false);
 	}
 
 	private void initHandlers()
@@ -84,12 +89,16 @@ public class ControlPanel implements iObservable
 		m_stopButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
-				m_startButton.setEnabled(true);
-				m_stopButton.setEnabled(false);
-				m_devThreadButton.setEnabled(false);
-				m_managersThreadButton.setEnabled(false);
-				m_listener.signal(ControlPanel.this,
-						new Message(SignalType.SIGNAL, Signal.Stop));
+                if(m_pauseEnabled) {
+                    m_listener.signal(ControlPanel.this, new Message(SignalType.SIGNAL, Signal.Pause, null));
+                } else {
+                    m_startButton.setEnabled(true);
+                    m_stopButton.setEnabled(false);
+                    m_devThreadButton.setEnabled(false);
+                    m_managersThreadButton.setEnabled(false);
+                    m_listener.signal(ControlPanel.this,
+                            new Message(SignalType.SIGNAL, Signal.Stop));
+                }
 			}
 		});
 		m_devThreadButton.addActionListener(new ActionListener()
@@ -211,7 +220,7 @@ public class ControlPanel implements iObservable
 			{
 				float possibility = m_devCreationPossibilityBox.getSelectedIndex() + 1;
 				possibility *= .1;
-				Listener.getInstance().signal(ControlPanel.this,
+                m_listener.signal(ControlPanel.this,
 						new Message(SignalType.DATA, Signal.DevPossibilityChanged, new Float(possibility)));
 
 				if(System.getProperty("DEBUG").equals("1")) {
@@ -226,7 +235,7 @@ public class ControlPanel implements iObservable
 			{
 				float possibility = m_managersPercentList.getSelectedIndex() + 1;
 				possibility *= .1;
-				Listener.getInstance().signal(ControlPanel.this,
+                m_listener.signal(ControlPanel.this,
 						new Message(SignalType.DATA, Signal.ManagerMaxNumberChanged, new Float(possibility)));
 
 				if(System.getProperty("DEBUG").equals("1")) {
@@ -337,6 +346,7 @@ public class ControlPanel implements iObservable
 				m_managersThreadButton.setEnabled(true);
 				break;
 			case Stop:
+            case ForceStop:
 				m_startButton.setEnabled(true);
 				m_stopButton.setEnabled(false);
 				m_devThreadButton.setEnabled(false);

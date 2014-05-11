@@ -156,7 +156,7 @@
                 </constraints>
                 <properties>
                   <horizontalAlignment value="0"/>
-                  <text value="1"/>
+                  <text value="5"/>
                 </properties>
               </component>
               <component id="207a8" class="javax.swing.JLabel">
@@ -176,7 +176,7 @@
                 </constraints>
                 <properties>
                   <horizontalAlignment value="0"/>
-                  <text value="1"/>
+                  <text value="10"/>
                 </properties>
               </component>
               <component id="43e0d" class="javax.swing.JLabel">
@@ -276,7 +276,7 @@
                 </constraints>
                 <properties>
                   <horizontalAlignment value="0"/>
-                  <text value="1"/>
+                  <text value="8"/>
                 </properties>
               </component>
               <component id="a5e7b" class="javax.swing.JLabel">
@@ -290,12 +290,13 @@
               </component>
               <component id="93ac1" class="javax.swing.JTextField" binding="m_managersLifeTimeField">
                 <constraints>
-                  <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                 </constraints>
                 <properties>
-                  <text value="1"/>
+                  <horizontalAlignment value="0"/>
+                  <text value="11"/>
                 </properties>
               </component>
               <component id="aaf64" class="javax.swing.JLabel">

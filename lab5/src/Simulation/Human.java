@@ -5,7 +5,8 @@ import Utils.Pair;
 import java.awt.*;
 
 public abstract class Human implements iBehaviour {
-	protected Pair<Int, Int>            m_position;
+    protected int                     m_posX;
+    protected int                     m_posY;
 	protected int                       m_id;
 	protected String                    m_image_path;
 	protected Image                     m_image;
@@ -22,7 +23,8 @@ public abstract class Human implements iBehaviour {
 
 	public Human(int id)
 	{
-		m_position = new Pair<>(new Int(), new Int());
+        m_posX = 0;
+        m_posY = 0;
 		m_id = id;
 		m_image_path = null;
 		m_image = null;
@@ -31,7 +33,8 @@ public abstract class Human implements iBehaviour {
 
 	public Human(int x, int y)
 	{
-		m_position = new Pair<>(new Int(x), new Int(y));
+        m_posX = x;
+        m_posY = y;
 		m_id = -1;
 		m_image_path = null;
 		m_image = null;
@@ -40,7 +43,8 @@ public abstract class Human implements iBehaviour {
 
 	public Human(int id, int x, int y)
 	{
-		m_position = new Pair<>(new Int(x), new Int(y));
+        m_posX = x;
+        m_posY = y;
 		m_id = id;
 		m_image_path = null;
 		m_image = null;
@@ -49,7 +53,8 @@ public abstract class Human implements iBehaviour {
 
 	public Human(int id, int x, int y, int current_time)
 	{
-		m_position = new Pair<>(new Int(x), new Int(y));
+        m_posX = x;
+        m_posY = y;
 		m_id = id;
 		m_image_path = null;
 		m_image = null;
@@ -58,8 +63,8 @@ public abstract class Human implements iBehaviour {
 
 	public void updatePosition(int x, int y)
 	{
-		m_position.first.set(x);
-		m_position.second.set(y);
+        m_posX = x;
+        m_posY = y;
 	}
 
 	public void setImage(Image image)
@@ -75,24 +80,24 @@ public abstract class Human implements iBehaviour {
 		if(width == -1 || height == -1){
 			return;
 		}
-		int offscreen_width = border.first.get() - (m_position.first.get() + width);
-		int offscreen_height = border.second.get() - (m_position.second.get() + height);
+		int offscreen_width = border.first.get() - (m_posX + width);
+		int offscreen_height = border.second.get() - (m_posY + height);
 
-		graphics.drawImage(m_image, m_position.first.get(), m_position.second.get(), null);
+		graphics.drawImage(m_image, m_posX, m_posY, null);
 		if(offscreen_width < 0 || offscreen_height < 0) {
 			if(offscreen_width < 0) {
 				offscreen_width = 0 - (width + offscreen_width);
-			} else {offscreen_width = m_position.first.get();}
+			} else {offscreen_width = m_posX;}
 			if(offscreen_height < 0) {
 				offscreen_height = 0 - (height + offscreen_height);
-			} else {offscreen_height = m_position.second.get();}
+			} else {offscreen_height = m_posY;}
 
 			graphics.drawImage(m_image, offscreen_width, offscreen_height, null);
 		}
 		if(System.getProperty("DEBUG").equals("1")) {
 			System.out.println("\tImage:\n\t\tWidth: " + width + "\n\t\tHeight: " + height);
-			System.out.println("\t\tScreen Width Position: " + m_position.first +
-					"\n\t\tScreen Height Position: " + m_position.second);
+			System.out.println("\t\tScreen Width Position: " + m_posX +
+					"\n\t\tScreen Height Position: " + m_posY);
 			System.out.println("\t\tOffscreen Width: " + offscreen_width +
 					"\n\t\tOffscreen Height: " + offscreen_height);
 		}
