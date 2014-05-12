@@ -7,6 +7,7 @@ import Listener.iObservable;
 import Signal.SignalType;
 import Signal.Signal;
 import Simulation.Habitat;
+import Utils.Int;
 
 import javax.swing.*;
 import java.awt.*;
@@ -49,6 +50,8 @@ public class SimulationPanel extends JPanel implements iObservable
 	@Override
 	public void signal(Message mess)
 	{
+        Int iVal = null;
+        Float fVal = null;
 		switch (mess.m_action) {
 			case Start:
 				m_habitat.start();
@@ -71,29 +74,49 @@ public class SimulationPanel extends JPanel implements iObservable
                 m_listener.signal(this, new Message(SignalType.DATA, Signal.LiveObjects, map));
 				break;
 			case DevCreationPeriodChanged:
-				m_habitat.setDevCreationPeriod((Integer)mess.m_data);
+                iVal = (Int) mess.m_data;
+				m_habitat.setDevCreationPeriod(iVal.get());
 				break;
 			case ManagerCreationPeriodChanged:
-				m_habitat.setManagerCreationPeriod((Integer)mess.m_data);
+                iVal = (Int) mess.m_data;
+				m_habitat.setManagerCreationPeriod(iVal.get());
 				break;
 			case DevLiveTimeChanged:
-				m_habitat.setDevLifeTime((Integer)mess.m_data);
+                iVal = (Int) mess.m_data;
+				m_habitat.setDevLifeTime(iVal.get());
 				break;
 			case ManagerLiveTimeChanged:
-				m_habitat.setManagerLifeTime((Integer)mess.m_data);
+                iVal = (Int) mess.m_data;
+				m_habitat.setManagerLifeTime(iVal.get());
 				break;
 			case DevPossibilityChanged:
-				m_habitat.setDevPossibility((Integer)mess.m_data);
+                fVal = (Float) mess.m_data;
+				m_habitat.setDevPossibility(fVal.intValue());
 				break;
 			case ManagerMaxNumberChanged:
-				m_habitat.setMaxNumOfManagers((Integer)mess.m_data);
+                fVal = (Float) mess.m_data;
+				m_habitat.setMaxNumOfManagers(fVal.intValue());
 				break;
 			case DevThreadPriority:
-				m_habitat.setDevThreadPriority((Integer)mess.m_data);
+//                iVal = (Int) mess.m_data;
+				m_habitat.setDevThreadPriority((Integer) mess.m_data);
 				break;
 			case ManagerThreaadPriority:
-				m_habitat.setManagerThreadPriority((Integer)mess.m_data);
+//                iVal = (Integer) mess.m_data.;
+				m_habitat.setManagerThreadPriority((Integer) mess.m_data);
 				break;
+            case StartDevThread:
+                m_habitat.resumeDevThread();
+                break;
+            case StopDevThread:
+                m_habitat.stopDevThread();
+                break;
+            case StartManThread:
+                m_habitat.resumeManThread();
+                break;
+            case StopManThread:
+                m_habitat.stopManThread();
+                break;
 		}
 	}
 }

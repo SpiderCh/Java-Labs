@@ -7,10 +7,8 @@ public class DeveloperAI extends BaseAI {
     private float   m_changePeriod    = 0;
     private float   m_accumulatedTime = 0;
 
-    private int     m_width  = 500;
-    private int     m_height = 600;
-
-    private boolean m_isFirstRun = true;
+    private int     m_width  = 818;
+    private int     m_height = 680;
 
     public DeveloperAI(LinkedList<Human> listEmployees, float speed, float period) {
         m_listEmployees = listEmployees;
@@ -21,10 +19,7 @@ public class DeveloperAI extends BaseAI {
 
     @Override
     protected void computeAI(float dt) {
-        if (m_isFirstRun) {
-
-        }
-
+        if(dt == 0) {System.exit(789);}
         m_accumulatedTime += dt;
         if (m_accumulatedTime > m_changePeriod) {
             setNewDirections();

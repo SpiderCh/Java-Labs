@@ -29,7 +29,7 @@ public class Habitat
 	private Image m_dev_image;
 	private Image m_man_image;
 
-    private DeveloperAI m_devAIThread = new DeveloperAI(m_personalList, 10.0f, 10);
+    private DeveloperAI m_devAIThread = new DeveloperAI(m_personalList, 1.0f, 10);
     private ManagerAI   m_manAIThread = new ManagerAI(m_personalList, 0.3f, 20);
 
 	private void initVars()
@@ -214,10 +214,7 @@ public class Habitat
         m_manAIThread.setState(2);
     }
 
-    public void resumeManThread()
-    {
-        m_manAIThread.setState(3);
-    }
+    public void resumeManThread() { m_manAIThread.setState(3); }
 
     private void removeOldObjects()
     {
@@ -250,6 +247,7 @@ public class Habitat
                     Human new_person = new Developer(id, pos_x, pos_y, (int) m_simulationTime);
                     new_person.setImage(m_dev_image);
                     new_person.changeLifeTime(m_lifeTimes.first.get());
+                    System.out.println(m_lifeTimes.first.get());
                     m_personalList.add(new_person);
                     m_employeesCounter.first.set(m_employeesCounter.first.get() + 1);
                     m_ids.add(id);

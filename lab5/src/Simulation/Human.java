@@ -58,7 +58,7 @@ public abstract class Human implements iBehaviour {
 		m_id = id;
 		m_image_path = null;
 		m_image = null;
-		m_vital_signs = new Pair<>(new Int(), new Int(10));
+		m_vital_signs = new Pair<>(new Int(current_time), new Int(10));
 	}
 
 	public void updatePosition(int x, int y)

@@ -7,6 +7,10 @@ public enum Signal
 	Stop,
 	ForceStop,
 	Pause,
+    StartDevThread,
+    StopDevThread,
+    StartManThread,
+    StopManThread,
 	//	END: SIGNAL
 //	BEGIN: INFO
 	ShowSimulationInfo,

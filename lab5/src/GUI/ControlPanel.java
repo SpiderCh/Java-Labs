@@ -108,8 +108,10 @@ public class ControlPanel implements iObservable
 			{
 				if(m_devThreadRunning) {
 					m_devThreadButton.setText("Start Thread");
+                    m_listener.signal(ControlPanel.this, new Message(SignalType.SIGNAL, Signal.StopDevThread, null));
 				} else {
 					m_devThreadButton.setText("Stop Thread");
+                    m_listener.signal(ControlPanel.this, new Message(SignalType.SIGNAL, Signal.StartDevThread, null));
 				}
 				m_devThreadRunning = !m_devThreadRunning;
 			}
@@ -121,8 +123,10 @@ public class ControlPanel implements iObservable
 			{
 				if(m_managerThreadRunning) {
 					m_managersThreadButton.setText("Start Thread");
+                    m_listener.signal(ControlPanel.this, new Message(SignalType.SIGNAL, Signal.StopManThread, null));
 				} else {
 					m_managersThreadButton.setText("Stop Thread");
+                    m_listener.signal(ControlPanel.this, new Message(SignalType.SIGNAL, Signal.StartManThread, null));
 				}
 				m_managerThreadRunning = !m_managerThreadRunning;
 			}

@@ -48,10 +48,13 @@ public abstract class BaseAI extends Thread {
                 if (m_isSleeping) {
                     try {
                         m_listEmployees.wait();
-                    } catch(InterruptedException e) { }
+                    } catch(InterruptedException e) { System.out.println("Cannot suspend thread");}
                 } else {
                     long currentTime = System.currentTimeMillis();
-                    float dt = (currentTime - m_oldTime) / 1000.0f;
+                    while(currentTime == m_oldTime) {
+                        currentTime = System.currentTimeMillis();
+                    }
+                    float dt = (currentTime - m_oldTime);
                     m_oldTime = currentTime;
                     computeAI(dt);
                 }
