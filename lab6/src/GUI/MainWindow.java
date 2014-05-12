@@ -13,10 +13,12 @@ import java.awt.MenuBar;
 import Listener.iListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.*;
 import java.util.HashMap;
+import java.util.Properties;
 import java.util.Timer;
 
-public class MainWindow extends JFrame implements iObservable, iWindow
+public class MainWindow extends JFrame implements iObservable, iWindow, Runnable
 {
 	private JPanel          m_mainPanel;
 	private SimulationPanel m_simulationPanel;
@@ -25,6 +27,10 @@ public class MainWindow extends JFrame implements iObservable, iWindow
 	private Timer           m_timer;
 	private iListener       m_listener;
     private ResultDialog    m_resultDialog;
+    private Console         m_console;
+    private PipedReader     m_pipedRider  = null;
+    private PipedWriter     m_pipedWriter = null;
+    private boolean         m_isGoingThread = false;
 
 	private void setupCloseAction()
 	{
@@ -60,7 +66,7 @@ public class MainWindow extends JFrame implements iObservable, iWindow
 
 	private void initWindow()
 	{
-		super.setTitle("Lab 5");
+		super.setTitle("Lab 6");
 		super.setSize(1024, 768);
 		super.setResizable(false);
 		GroupLayout layout = new GroupLayout(this);
@@ -78,6 +84,40 @@ public class MainWindow extends JFrame implements iObservable, iWindow
     private void initVars()
     {
         m_resultDialog = new ResultDialog("Simulation Results");
+        m_console = new Console();
+        m_pipedWriter = new PipedWriter();
+        m_console.setPipedReader(m_pipedWriter);
+        try {
+            m_pipedRider    = new PipedReader(m_console.getPipedWriter());
+            m_isGoingThread = true;
+            new Thread(this).start();
+        } catch(IOException e) { }
+    }
+
+    private void saveProperties()
+    {
+        try {
+            FileOutputStream fileOutput = new FileOutputStream("config");
+            Properties properties = new Properties();
+            properties = m_controlPanel.saveProperties(properties);
+            properties.store(fileOutput, "config");
+            fileOutput.close();
+        }
+        catch (Exception e) { }
+    }
+
+    private void loadProperties()
+    {
+        try {
+            FileInputStream fileInput  = new FileInputStream("config");
+            Properties      properties = new Properties();
+
+            properties.load(fileInput);
+            fileInput.close();
+
+            m_controlPanel.loadProperties(properties);
+        }
+        catch (Exception e) { }
     }
 
 	public MainWindow()
@@ -115,4 +155,29 @@ public class MainWindow extends JFrame implements iObservable, iWindow
                 break;
 		}
 	}
+
+    @Override
+    public void run() {
+        while(m_isGoingThread) {
+            try {
+                int command = m_pipedRider.read();
+                int count   = m_pipedRider.read();
+
+                switch (command) {
+                    case 0:
+                        int countManF = m_simulationPanel.fireAllManagers();
+
+                        m_pipedWriter.write(0);
+                        m_pipedWriter.write(countManF);
+                        break;
+                    case 1:
+                        int countManH = m_simulationPanel.hireManagers(count);
+
+                        m_pipedWriter.write(1);
+                        m_pipedWriter.write(countManH);
+                        break;
+                }
+            } catch(IOException e) { }
+        }
+    }
 }

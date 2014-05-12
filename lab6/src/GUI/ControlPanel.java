@@ -10,6 +10,7 @@ import Utils.Int;
 
 import javax.swing.*;
 import java.awt.event.*;
+import java.util.Properties;
 
 class KeyTyped extends KeyAdapter
 {
@@ -55,6 +56,7 @@ public class ControlPanel implements iObservable
 	{
 		m_listener.subscribe(this, SignalType.SIGNAL);
 		m_listener.subscribe(this, SignalType.INFO);
+        m_listener.subscribe(this, SignalType.SYSTEM);
 	}
 
 	private void initVars()
@@ -340,9 +342,62 @@ public class ControlPanel implements iObservable
 		return m_controlPanel;
 	}
 
+    public Properties saveProperties(Properties properties)
+    {
+        properties.setProperty("showTimeFlag", String.valueOf(m_showTimeRadioButton.isSelected()));
+        properties.setProperty("showInfoFlag", String.valueOf(m_showSimulationInfoBox.isSelected()));
+
+        properties.setProperty("priorityAIThreadManager",
+                String.valueOf(m_managersThreadPriorityBox.getSelectedIndex()));
+        properties.setProperty("priorityAIThreadDeveloper",
+                String.valueOf(m_devThreadPriorityBox.getSelectedIndex()));
+
+        properties.setProperty("createPeriodManager",
+                String.valueOf(m_managerCreationPeriodField.getText()));
+        properties.setProperty("createPeriodDeveloper",
+                String.valueOf(m_devCreationPeriodField.getText()));
+
+        properties.setProperty("lifeTimePeriodManager",
+                String.valueOf(m_managersLifeTimeField.getText()));
+        properties.setProperty("lifeTimePeriodDeveloper",
+                String.valueOf(m_devCreationPeriodField.getText()));
+
+        properties.setProperty("possibilityOfManager",
+                String.valueOf(m_managersPercentList.getSelectedIndex()));
+        properties.setProperty("possibilityOfDeveloper",
+                String.valueOf(m_devCreationPossibilityBox.getSelectedIndex()));
+
+        return properties;
+    }
+
+    public void loadProperties(Properties properties)
+    {
+        boolean showTime = Boolean.parseBoolean(properties.getProperty("showTimeFlag"));
+        boolean showInfo = Boolean.parseBoolean(properties.getProperty("showInfoFlag"));
+        int priorityAIThreadManager = Integer.parseInt(properties.getProperty("priorityAIThreadManager"));
+        int priorityAIThreadDeveloper = Integer.parseInt(properties.getProperty("priorityAIThreadDeveloper"));
+        String createPeriodManager = properties.getProperty("createPeriodManager");
+        String createPeriodDeveloper = properties.getProperty("createPeriodDeveloper");
+        String lifeTimePeriodManager = properties.getProperty("lifeTimePeriodManager");
+        String lifeTimePeriodDeveloper = properties.getProperty("lifeTimePeriodDeveloper");
+        Float possibilityOfManager = Float.parseFloat(properties.getProperty("possibilityOfManager"));
+        Float possibilityOfDeveloper = Float.parseFloat(properties.getProperty("possibilityOfDeveloper"));
+
+        if(showTime) {m_listener.signal(null, new Message(SignalType.INFO, Signal.ShowTime, null));}
+        else {m_listener.signal(null, new Message(SignalType.INFO, Signal.HideTime, null));}
+        if(showInfo) {m_listener.signal(null, new Message(SignalType.INFO, Signal.ShowSimulationInfo, null));}
+        else {m_listener.signal(null, new Message(SignalType.INFO, Signal.HideSimulationInfo, null));}
+
+        m_devThreadPriorityBox.setSelectedIndex(priorityAIThreadDeveloper);
+        m_listener.signal(this, new Message(SignalType.DATA, Signal.DevThreadPriority, new Integer(priorityAIThreadDeveloper)));
+        m_managersThreadPriorityBox.setSelectedIndex(priorityAIThreadManager);
+        m_listener.signal(this, new Message(SignalType.DATA, Signal.ManagerThreaadPriority, new Integer(priorityAIThreadManager)));
+    }
+
 	@Override
 	public void signal(Message mess)
 	{
+//        Properties properties = null;
 		switch (mess.m_action)
 		{
 			case Start:

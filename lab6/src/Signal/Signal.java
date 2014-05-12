@@ -33,6 +33,10 @@ public enum Signal
 	//	END: DATA
 //	BEGIN: SYSTEM
 	Repaint,
-	TimeDimensionChanged
+    ShowConsole,
+    SaveSimulation,
+    LoadSimulation,
+    SaveProperties,
+    LoadProperties
 //	END: SYSTEM
 }

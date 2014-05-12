@@ -1,6 +1,8 @@
 package Simulation;
 
-public class Developer extends Human {
+import java.io.Serializable;
+
+public class Developer extends Human implements Serializable {
     protected float m_dx = 1;
     protected float m_dy = 0;
 

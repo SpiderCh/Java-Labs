@@ -11,6 +11,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 public class MenuBar extends JMenuBar implements iObservable
 {
@@ -20,6 +21,7 @@ public class MenuBar extends JMenuBar implements iObservable
 	private JCheckBoxMenuItem m_changeShowInfoItem;
 	private boolean m_startEnabled;
 	private boolean m_pauseEnabled;
+    private final JFileChooser m_fileChooser;//        = new JFileChooser();
 
 	private void subscribe()
 	{
@@ -48,7 +50,33 @@ public class MenuBar extends JMenuBar implements iObservable
 					}
 				}
 		);
-		fileMenu.add(exitItem);
+
+        JMenuItem saveMenu = new JMenuItem("Save");
+        JMenuItem  loadMenu = new JMenuItem("Load");
+
+        fileMenu.add(saveMenu);
+        fileMenu.add(loadMenu);
+        fileMenu.add(exitItem);
+
+        saveMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                m_fileChooser.setDialogTitle("Saving simulation");
+                m_fileChooser.showSaveDialog(null);
+                File file = m_fileChooser.getSelectedFile();
+                m_listener.signal(MenuBar.this, new Message(SignalType.SYSTEM, Signal.SaveSimulation, file));
+            }
+        });
+
+        loadMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                m_fileChooser.setDialogTitle("Loading simulation");
+                m_fileChooser.showSaveDialog(null);
+                File file = m_fileChooser.getSelectedFile();
+                m_listener.signal(MenuBar.this, new Message(SignalType.SYSTEM, Signal.LoadSimulation, file));
+            }
+        });
 
 		JMenu simulation = new JMenu("Simulation");
 		m_startStopItem = new JMenuItem("Start");
@@ -108,6 +136,18 @@ public class MenuBar extends JMenuBar implements iObservable
 		});
 		simulation.add(m_changeShowInfoItem);
 
+        JMenuItem console = new JMenuItem("Console");
+        console.addActionListener(
+                new ActionListener()
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        Listener.getInstance().signal(MenuBar.this, new Message(SignalType.SYSTEM, Signal.ShowConsole, null));
+                    }
+                }
+        );
+        simulation.add(console);
+
 		add(fileMenu);
 		add(simulation);
 	}
@@ -117,6 +157,7 @@ public class MenuBar extends JMenuBar implements iObservable
 		m_listener = Listener.getInstance();
 		m_startEnabled = false;
 		m_pauseEnabled = false;
+        m_fileChooser = new JFileChooser();
 		initMenuBar();
 		subscribe();
 	}

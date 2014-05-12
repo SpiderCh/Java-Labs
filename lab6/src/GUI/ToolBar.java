@@ -10,6 +10,7 @@ import Listener.iListener;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.tools.Tool;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -19,7 +20,8 @@ public class ToolBar implements iObservable//, ChangeListener
 	private JButton   m_stopButton;
 	private JButton   m_timeButton;
 	private JPanel    m_controlBar;
-	private JLabel    m_periodValue;
+    private JButton m_consoleButton;
+    private JLabel    m_periodValue;
 	private iListener m_listener;
 	private boolean   m_showTime;
     private boolean   m_pauseEnabled;
@@ -69,6 +71,15 @@ public class ToolBar implements iObservable//, ChangeListener
                             new Message(SignalType.INFO, Signal.ShowTime));
                 }
                 m_showTime = !m_showTime;
+            }
+        });
+
+        m_consoleButton.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent)
+            {
+                m_listener.signal(ToolBar.this, new Message(SignalType.SYSTEM, Signal.ShowConsole, null));
             }
         });
 	}

@@ -3,14 +3,16 @@ package Simulation;
 import Utils.Int;
 import Utils.Pair;
 import java.awt.*;
+import java.io.Serializable;
 
-public abstract class Human implements iBehaviour {
+public abstract class Human implements iBehaviour, Serializable {
     protected int                     m_posX;
     protected int                     m_posY;
 	protected int                       m_id;
 	protected String                    m_image_path;
 	protected Image                     m_image;
-	protected Pair<Int, Int>            m_vital_signs;
+    protected int                       m_creationTime;
+    protected int                       m_lifeTime;
 	protected PersonalType              m_type;
 
 	public Human()
@@ -18,7 +20,8 @@ public abstract class Human implements iBehaviour {
 		m_id = -1;
 		m_image_path = null;
 		m_image = null;
-		m_vital_signs = new Pair<>(new Int(-1), new Int(10));
+        m_creationTime = -1;
+        m_lifeTime = 10;
 	}
 
 	public Human(int id)
@@ -28,7 +31,8 @@ public abstract class Human implements iBehaviour {
 		m_id = id;
 		m_image_path = null;
 		m_image = null;
-		m_vital_signs = new Pair<>(new Int(), new Int(10));
+        m_creationTime = -1;
+        m_lifeTime = 10;
 	}
 
 	public Human(int x, int y)
@@ -38,7 +42,8 @@ public abstract class Human implements iBehaviour {
 		m_id = -1;
 		m_image_path = null;
 		m_image = null;
-		m_vital_signs = new Pair<>(new Int(), new Int(10));
+        m_creationTime = -1;
+        m_lifeTime = 10;
 	}
 
 	public Human(int id, int x, int y)
@@ -48,7 +53,8 @@ public abstract class Human implements iBehaviour {
 		m_id = id;
 		m_image_path = null;
 		m_image = null;
-		m_vital_signs = new Pair<>(new Int(), new Int(10));
+        m_creationTime = -1;
+        m_lifeTime = 10;
 	}
 
 	public Human(int id, int x, int y, int current_time)
@@ -58,7 +64,8 @@ public abstract class Human implements iBehaviour {
 		m_id = id;
 		m_image_path = null;
 		m_image = null;
-		m_vital_signs = new Pair<>(new Int(current_time), new Int(10));
+        m_creationTime = current_time;
+        m_lifeTime = 10;
 	}
 
 	public void updatePosition(int x, int y)
@@ -113,12 +120,12 @@ public abstract class Human implements iBehaviour {
 
 	public int getCreationTime()
 	{
-		return m_vital_signs.first.get();
+		return m_creationTime;
 	}
 
 	public int getLifeTime()
 	{
-		return m_vital_signs.second.get();
+		return m_lifeTime;
 	}
 
 	public void changeLifeTime(int newTime)
@@ -126,7 +133,7 @@ public abstract class Human implements iBehaviour {
 		if(System.getProperty("DEBUG").equals("1")) {
 			System.out.println("\tChanged life time to: " + newTime);
 		}
-		m_vital_signs.second.set(newTime);
+		m_lifeTime = newTime;
 	}
 
 	public PersonalType getType()

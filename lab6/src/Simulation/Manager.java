@@ -1,6 +1,8 @@
 package Simulation;
 
-public class Manager extends Human {
+import java.io.Serializable;
+
+public class Manager extends Human implements Serializable {
     protected float m_xCenter = 0;
     protected float m_yCenter = 0;
 

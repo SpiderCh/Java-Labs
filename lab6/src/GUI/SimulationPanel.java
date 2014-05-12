@@ -11,6 +11,7 @@ import Utils.Int;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.util.HashMap;
 
 public class SimulationPanel extends JPanel implements iObservable
@@ -18,13 +19,15 @@ public class SimulationPanel extends JPanel implements iObservable
 	private JPanel m_simulationPanel;
 	private iListener m_listener;
 	private Habitat m_habitat;
+    private boolean m_isRunning;
 
 	private void initListener()
 	{
 		m_listener = Listener.getInstance();
 		m_listener.subscribe(this, SignalType.DATA);
-		m_listener.subscribe(this, SignalType.SIGNAL);
-		m_listener.subscribe(this, SignalType.INFO);
+        m_listener.subscribe(this, SignalType.INFO);
+        m_listener.subscribe(this, SignalType.SIGNAL);
+        m_listener.subscribe(this, SignalType.SYSTEM);
 	}
 
 	public SimulationPanel()
@@ -32,6 +35,7 @@ public class SimulationPanel extends JPanel implements iObservable
 		initListener();
 		setBackground(Color.white);
 		m_habitat = new Habitat();
+        m_isRunning = false;
 		this.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 	}
 
@@ -39,6 +43,16 @@ public class SimulationPanel extends JPanel implements iObservable
 	{
 		m_habitat.update(time);
 	}
+
+    public int fireAllManagers()
+    {
+        return m_habitat.fireAllManagers();
+    }
+
+    public int hireManagers(int num)
+    {
+        return m_habitat.hireManagers(num);
+    }
 
 	@Override
 	public void paint(Graphics g)
@@ -50,14 +64,17 @@ public class SimulationPanel extends JPanel implements iObservable
 	@Override
 	public void signal(Message mess)
 	{
-        Int iVal = null;
-        Float fVal = null;
+        File f      = null;
+        Int iVal    = null;
+        Float fVal  = null;
 		switch (mess.m_action) {
 			case Start:
+                m_isRunning = true;
 				m_habitat.start();
 				break;
 			case Stop:
 			case ForceStop:
+                m_isRunning = false;
 				m_habitat.stop();
 				break;
             case Pause:
@@ -98,11 +115,9 @@ public class SimulationPanel extends JPanel implements iObservable
 				m_habitat.setMaxNumOfManagers(fVal.intValue());
 				break;
 			case DevThreadPriority:
-//                iVal = (Int) mess.m_data;
 				m_habitat.setDevThreadPriority((Integer) mess.m_data);
 				break;
 			case ManagerThreaadPriority:
-//                iVal = (Integer) mess.m_data.;
 				m_habitat.setManagerThreadPriority((Integer) mess.m_data);
 				break;
             case StartDevThread:
@@ -116,6 +131,22 @@ public class SimulationPanel extends JPanel implements iObservable
                 break;
             case StopManThread:
                 m_habitat.stopManThread();
+                break;
+            case SaveSimulation:
+                f = (File) mess.m_data;
+                m_habitat.safeSimulation(f);
+                break;
+            case LoadSimulation:
+                f = (File) mess.m_data;
+                if(m_habitat.loadSimulation(f)) {
+                    if(!m_isRunning) {
+                        m_listener.signal(this, new Message(SignalType.SIGNAL, Signal.Start, null));
+                    }
+                } else {
+                    JDialog errorDialog = new JOptionPane("Cannot load simulation.",
+                            JOptionPane.ERROR_MESSAGE,
+                            JOptionPane.CLOSED_OPTION).createDialog("Loading error.");
+                }
                 break;
 		}
 	}

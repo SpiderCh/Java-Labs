@@ -4,6 +4,7 @@ import Utils.Int;
 import Utils.Pair;
 
 import java.awt.*;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -299,5 +300,107 @@ public class Habitat
     public HashMap<Integer, Integer> getCurrentPersonalTable()
     {
         return new HashMap<>(m_curentPersonal);
+    }
+
+    public int fireAllManagers()
+    {
+        if(!m_isRunning) {return 0;}
+        int count = 0;
+
+        synchronized (m_personalList) {
+            Iterator<Human> it = m_personalList.iterator();
+            while (it.hasNext()) {
+                Human emp = it.next();
+                if (emp instanceof Manager) {
+                    m_ids.remove(emp.m_id);
+                    m_curentPersonal.remove(emp.m_id);
+                    it.remove();
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    public int hireManagers(int num)
+    {
+        if(!m_isRunning) {return 0;}
+        int pos_x = 0;
+        int pos_y = 0;
+        int id = m_employeesCounter.first.get() + m_employeesCounter.second.get();
+
+        synchronized (m_personalList) {
+            for (int i = 0; i < num; ++i) {
+                do {
+                    pos_x = (int) (Math.random() * m_workingAreaSize.first.get());
+                } while (pos_x == 0);
+                do {
+                    pos_y = (int) (Math.random() * m_workingAreaSize.second.get());
+                } while (pos_y == 0);
+
+                Human new_person = new Manager(id, pos_x, pos_y, (int) m_simulationTime);
+                new_person.setImage(m_man_image);
+                new_person.changeLifeTime(m_lifeTimes.second.get());
+                m_personalList.add(new_person);
+                m_employeesCounter.second.set(m_employeesCounter.second.get() + 1);
+                m_ids.add(id);
+                m_curentPersonal.put(id, (int) m_simulationTime);
+
+                id = m_employeesCounter.first.get() + m_employeesCounter.second.get();
+                pos_x = pos_y = 0;
+            }
+        }
+        return num;
+    }
+
+    public void safeSimulation(File file)
+    {
+        ObjectOutputStream outputStream;
+        try {
+            outputStream = new ObjectOutputStream(new FileOutputStream(file));
+
+            outputStream.writeObject(m_simulationTime);
+
+            outputStream.writeObject(m_employeesCounter.first.get());
+            outputStream.writeObject(m_employeesCounter.second.get());
+
+            synchronized (m_personalList) {
+                outputStream.writeObject(m_ids);
+                outputStream.writeObject(m_curentPersonal);
+                outputStream.writeObject(m_personalList);
+            }
+
+            outputStream.flush();
+            outputStream.close();
+        } catch (IOException ex) { }
+    }
+
+    public boolean loadSimulation(File file)
+    {
+        ObjectInputStream inputStream;
+        try {
+            inputStream = new ObjectInputStream(new FileInputStream(file));
+
+            m_simulationTime = (float)inputStream.readObject();
+
+            m_employeesCounter.first.set((int)inputStream.readObject());
+            m_employeesCounter.second.set((int)inputStream.readObject());
+
+            synchronized (m_personalList) {
+                m_personalList.clear();
+                m_ids.clear();
+                m_curentPersonal.clear();
+
+                m_ids.addAll((TreeSet<Integer>)inputStream.readObject());
+                m_curentPersonal.putAll((HashMap<Integer, Integer>)inputStream.readObject());
+                m_personalList.addAll((LinkedList<Human>)inputStream.readObject());
+            }
+
+            inputStream.close();
+        } catch (Exception ex) {
+            return false;
+        }
+
+        return true;
     }
 }
