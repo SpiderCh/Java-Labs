@@ -71,6 +71,8 @@ public class ControlPanel implements iObservable
         m_devCreationPossibilityBox.setFocusable(false);
         m_managersPercentList.setSelectedIndex(6);
         m_managersPercentList.setFocusable(false);
+        m_devThreadPriorityBox.setSelectedIndex(4);
+        m_managersThreadPriorityBox.setSelectedIndex(4);
 	}
 
 	private void initHandlers()
